@@ -1,4 +1,11 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# dependencies = [
+#   "openpyxl",
+# ]
+# ///
 # MAGIC %md
 # MAGIC # E4.2 · Diccionario de Datos
 # MAGIC **Cierra con:** M3 MDM y Metadata, sobre el modelo físico de M4 · **Formato oficial:**
@@ -43,6 +50,10 @@ display(borrador)
 
 # ✏️ Exporte este borrador, péguelo en la plantilla institucional y complete las
 #    16 columnas de negocio restantes acordándolas con el "área" dueña de cada dominio.
+
+# COMMAND ----------
+
+# MAGIC %pip install openpyxl
 
 # COMMAND ----------
 

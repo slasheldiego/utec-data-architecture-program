@@ -22,31 +22,31 @@
 # COMMAND ----------
 
 # DBTITLE 1: Q1 — Evolución de reseñas y rating (Producto)
-# MAGIC %sql
-# MAGIC SELECT mes, sum(n_resenas) AS resenas, round(avg(rating_promedio),2) AS rating
-# MAGIC FROM workspace.yelp_gold.gld_kpi_negocio_mensual
-# MAGIC GROUP BY mes ORDER BY mes;
+%sql
+SELECT mes, sum(n_resenas) AS resenas, round(avg(rating_promedio),2) AS rating
+FROM workspace.yelp_gold.gld_kpi_negocio_mensual
+GROUP BY mes ORDER BY mes;
 
 # COMMAND ----------
 
 # DBTITLE 1: Q2 — Salud de calidad de datos (CDO)
-# MAGIC %sql
-# MAGIC SELECT r.dimension, round(avg(res.pct_cumplimiento),2) AS cumplimiento,
-# MAGIC        sum(CASE WHEN NOT res.paso THEN 1 ELSE 0 END)  AS reglas_en_rojo
-# MAGIC FROM workspace.yelp_gov.dq_resultados res
-# MAGIC JOIN workspace.yelp_gov.dq_reglas r USING (regla_id)
-# MAGIC WHERE res.ejecucion_ts = (SELECT max(ejecucion_ts) FROM workspace.yelp_gov.dq_resultados)
-# MAGIC GROUP BY r.dimension;
+%sql
+SELECT r.dimension, round(avg(res.pct_cumplimiento),2) AS cumplimiento,
+       sum(CASE WHEN NOT res.paso THEN 1 ELSE 0 END)  AS reglas_en_rojo
+FROM workspace.yelp_gov.dq_resultados res
+JOIN workspace.yelp_gov.dq_reglas r USING (regla_id)
+WHERE res.ejecucion_ts = (SELECT max(ejecucion_ts) FROM workspace.yelp_gov.dq_resultados)
+GROUP BY r.dimension;
 
 # COMMAND ----------
 
 # DBTITLE 1: Q3 — KPIs de gobierno (CDO)
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   (SELECT round(100.0*sum(CASE WHEN descripcion_columna IS NOT NULL THEN 1 ELSE 0 END)/count(*),1)
-# MAGIC      FROM workspace.yelp_gov.diccionario_datos)                       AS pct_columnas_documentadas,
-# MAGIC   (SELECT count(*) FROM workspace.yelp_gov.matriz_raci)               AS entidades_con_owner,
-# MAGIC   (SELECT count(*) FROM workspace.yelp_gov.glosario_negocio)          AS terminos_glosario;
+%sql
+SELECT
+  (SELECT round(100.0*sum(CASE WHEN descripcion_columna IS NOT NULL THEN 1 ELSE 0 END)/count(*),1)
+     FROM workspace.yelp_gov.diccionario_datos)                       AS pct_columnas_documentadas,
+  (SELECT count(*) FROM workspace.yelp_gov.matriz_raci)               AS entidades_con_owner,
+  (SELECT count(*) FROM workspace.yelp_gov.glosario_negocio)          AS terminos_glosario;
 
 # COMMAND ----------
 

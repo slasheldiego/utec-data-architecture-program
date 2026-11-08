@@ -13,28 +13,28 @@
 # COMMAND ----------
 
 # DBTITLE 1: Sentimiento y clasificación de una muestra de reseñas
-# MAGIC %sql
-# MAGIC CREATE OR REPLACE TABLE workspace.yelp_gold.gld_resenas_enriquecidas
-# MAGIC COMMENT 'Muestra de reseñas enriquecidas con IA: sentimiento y tema. Consumidor: Trust & Safety y Producto.'
-# MAGIC AS
-# MAGIC WITH muestra AS (
-# MAGIC   SELECT review_id, business_id, stars, text
-# MAGIC   FROM workspace.yelp_silver.slv_review
-# MAGIC   TABLESAMPLE (500 ROWS)
-# MAGIC )
-# MAGIC SELECT
-# MAGIC   review_id, business_id, stars,
-# MAGIC   ai_analyze_sentiment(text)                                            AS sentimiento,
-# MAGIC   ai_classify(text, array('comida','servicio','precio','ambiente','otro')) AS tema
-# MAGIC FROM muestra;
+%sql
+CREATE OR REPLACE TABLE workspace.yelp_gold.gld_resenas_enriquecidas
+COMMENT 'Muestra de reseñas enriquecidas con IA: sentimiento y tema. Consumidor: Trust & Safety y Producto.'
+AS
+WITH muestra AS (
+  SELECT review_id, business_id, stars, text
+  FROM workspace.yelp_silver.slv_review
+  TABLESAMPLE (500 ROWS)
+)
+SELECT
+  review_id, business_id, stars,
+  ai_analyze_sentiment(text)                                            AS sentimiento,
+  ai_classify(text, array('comida','servicio','precio','ambiente','otro')) AS tema
+FROM muestra;
 
 # COMMAND ----------
 
 # DBTITLE 1: ✏️ TODO — Detección de inconsistencia rating vs sentimiento (señal de fraude)
-# MAGIC %sql
-# MAGIC -- Reseñas con 5 estrellas y sentimiento negativo (o viceversa) son candidatas a revisión
-# MAGIC -- por Trust & Safety. Construir la consulta y agregar el visual al dashboard E8.
-# MAGIC -- SELECT ... FROM workspace.yelp_gold.gld_resenas_enriquecidas WHERE ...;
+%sql
+-- Reseñas con 5 estrellas y sentimiento negativo (o viceversa) son candidatas a revisión
+-- por Trust & Safety. Construir la consulta y agregar el visual al dashboard E8.
+-- SELECT ... FROM workspace.yelp_gold.gld_resenas_enriquecidas WHERE ...;
 
 # COMMAND ----------
 

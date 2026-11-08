@@ -1,4 +1,11 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# dependencies = [
+#   "openpyxl",
+# ]
+# ///
 # MAGIC %md
 # MAGIC # E4.1 · Glosario de Negocio
 # MAGIC **Cierra con:** M3 MDM y Metadata · **Formato oficial:** plantilla institucional
@@ -26,6 +33,10 @@
 spark.sql("CREATE VOLUME IF NOT EXISTS workspace.yelp_gov.artefactos")
 RUTA = "/Volumes/workspace/yelp_gov/artefactos/Glosario_de_terminos_de_negocio_YelpConnect.xlsx"
 print(f"Suba el Excel completado a: {RUTA}")
+
+# COMMAND ----------
+
+# MAGIC %pip install openpyxl
 
 # COMMAND ----------
 
