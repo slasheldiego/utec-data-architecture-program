@@ -11,38 +11,38 @@
 
 # COMMAND ----------
 
-# MAGIC # E7.2 · Bronze → Silver: limpieza y conformación (Grupo 06)
-# MAGIC **Cierra con:** M6 Big Data
-# MAGIC
-# MAGIC Silver materializa el **modelo físico de E3**: mismos nombres, mismos tipos, mismas constraints.
-# MAGIC Por eso las tablas **no se recrean** aquí: se llenan con `insertInto` (overwrite), que respeta el DDL,
-# MAGIC los COMMENT, las PK/FK y las máscaras de E6. El rango de `stars` lo garantiza DQ-001 (cuarentena), sin CHECK (Anexo C).
-# MAGIC
-# MAGIC **Cuarentena.** Los registros que incumplen una regla de calidad cuya decisión es "aislar" (sección 6.2)
-# MAGIC no entran a silver: van a `workspace.yelp_gov.cuarentena_<entidad>` con la regla y el motivo.
-# MAGIC La cuarentena vive en `yelp_gov` y no en `yelp_silver` porque el Diccionario (E4) exige documentar el 100 % de las columnas de silver.
-# MAGIC
-# MAGIC | Regla | Entidad | Decisión en este notebook |
-# MAGIC |---|---|---|
-# MAGIC | DQ-004 · identificador de negocio único y no nulo | Negocio | Cuarentena (se conserva la versión más reciente) |
-# MAGIC | DQ-015 · identificador de usuario único y no nulo | Usuario | Cuarentena (se conserva la versión más reciente) |
-# MAGIC | DQ-002 · reseña sin duplicar | Reseña | Cuarentena de las repeticiones (se conserva la más reciente) |
-# MAGIC | DQ-001 · estrellas entre 1 y 5 | Reseña | Cuarentena |
-# MAGIC | DQ-005 · reseña con usuario y fecha | Reseña | Cuarentena |
-# MAGIC | DQ-003 · reseña con negocio existente | Reseña | Cuarentena |
-# MAGIC | DQ-011 · reseña con usuario existente | Reseña | Cuarentena |
-# MAGIC | DQ-018 · tip con negocio y usuario existentes | Tip | Cuarentena |
-# MAGIC | DQ-019 · check-in con negocio existente y fecha no futura | Check-in | Cuarentena |
-# MAGIC
-# MAGIC Las demás reglas (DQ-006 a DQ-010, DQ-012 a DQ-014, DQ-016, DQ-017) **marcan, no aíslan**: los registros
-# MAGIC quedan en silver y E5 mide su cumplimiento. Si un registro incumple varias reglas de aislamiento, se registra
-# MAGIC la primera según el orden de la tabla.
-# MAGIC
-# MAGIC **Criterio de duplicados lógicos (pedido del curso).** Las reseñas con el mismo negocio y texto idéntico
-# MAGIC **no se eliminan**: son una señal de fraude que se mide con DQ-010 y se marca en gold (ADR-02: marcar, no eliminar).
-# MAGIC
-# MAGIC > **Trazabilidad —** implementa la sección «3. Arquitectura de referencia» (bloques *Transformación y conformado*
-# MAGIC > y *Revisión automática de la calidad*) y las decisiones de la sección 6.2 del Documento Formal.
+# E7.2 · Bronze → Silver: limpieza y conformación (Grupo 06)
+**Cierra con:** M6 Big Data
+
+Silver materializa el **modelo físico de E3**: mismos nombres, mismos tipos, mismas constraints.
+Por eso las tablas **no se recrean** aquí: se llenan con `insertInto` (overwrite), que respeta el DDL,
+los COMMENT, las PK/FK y las máscaras de E6. El rango de `stars` lo garantiza DQ-001 (cuarentena), sin CHECK (Anexo C).
+
+**Cuarentena.** Los registros que incumplen una regla de calidad cuya decisión es "aislar" (sección 6.2)
+no entran a silver: van a `workspace.yelp_gov.cuarentena_<entidad>` con la regla y el motivo.
+La cuarentena vive en `yelp_gov` y no en `yelp_silver` porque el Diccionario (E4) exige documentar el 100 % de las columnas de silver.
+
+| Regla | Entidad | Decisión en este notebook |
+|---|---|---|
+| DQ-004 · identificador de negocio único y no nulo | Negocio | Cuarentena (se conserva la versión más reciente) |
+| DQ-015 · identificador de usuario único y no nulo | Usuario | Cuarentena (se conserva la versión más reciente) |
+| DQ-002 · reseña sin duplicar | Reseña | Cuarentena de las repeticiones (se conserva la más reciente) |
+| DQ-001 · estrellas entre 1 y 5 | Reseña | Cuarentena |
+| DQ-005 · reseña con usuario y fecha | Reseña | Cuarentena |
+| DQ-003 · reseña con negocio existente | Reseña | Cuarentena |
+| DQ-011 · reseña con usuario existente | Reseña | Cuarentena |
+| DQ-018 · tip con negocio y usuario existentes | Tip | Cuarentena |
+| DQ-019 · check-in con negocio existente y fecha no futura | Check-in | Cuarentena |
+
+Las demás reglas (DQ-006 a DQ-010, DQ-012 a DQ-014, DQ-016, DQ-017) **marcan, no aíslan**: los registros
+quedan en silver y E5 mide su cumplimiento. Si un registro incumple varias reglas de aislamiento, se registra
+la primera según el orden de la tabla.
+
+**Criterio de duplicados lógicos (pedido del curso).** Las reseñas con el mismo negocio y texto idéntico
+**no se eliminan**: son una señal de fraude que se mide con DQ-010 y se marca en gold (ADR-02: marcar, no eliminar).
+
+> **Trazabilidad —** implementa la sección «3. Arquitectura de referencia» (bloques *Transformación y conformado*
+> y *Revisión automática de la calidad*) y las decisiones de la sección 6.2 del Documento Formal.
 
 # COMMAND ----------
 
@@ -262,7 +262,7 @@ print(f"✔ Bitácora: {len(filas)} registros · carga a silver en {duracion} s"
 # DBTITLE 1,Gate de calidad — se detiene si una regla de criticidad alta falla sin excepción vigente
 # Una falla con excepción aprobada y vigente (sección 5.5 · Anexo D) no detiene el pipeline, pero sigue
 # registrada como falla en dq_resultados: la excepción no oculta el problema, documenta quién asumió el riesgo.
-resultado = dbutils.notebook.run("../E5_calidad_datos/01_reglas_calidad_exploratorio", 1200)
+resultado = dbutils.notebook.run("../E5_calidad_datos/01_reglas_calidad_grupo_06", 1200)
 print(f"Motor de calidad: {resultado}")
 
 fallas = spark.sql("""
@@ -294,7 +294,7 @@ print("✔ Gate de calidad superado")
 # MAGIC - [x] Check-ins explotados a grano evento.
 # MAGIC - [x] Gate de calidad integrado (ejecuta E5 y se detiene si falla una regla de criticidad alta sin excepción vigente).
 # MAGIC - [ ] Capturar el resultado del diagnóstico de la muestra y del gate como evidencia.
-
+# MAGIC
 
 # COMMAND ----------
 
@@ -304,7 +304,7 @@ print("✔ Gate de calidad superado")
 # MAGIC - [ ] Deduplicación de reseñas con criterio documentado + tabla de cuarentena operativa.
 # MAGIC - [ ] Check-ins explotados a grano evento.
 # MAGIC - [ ] Gate de calidad integrado y funcionando.
-
+# MAGIC
 
 # COMMAND ----------
 

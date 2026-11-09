@@ -46,9 +46,9 @@ NOMBRE = dbutils.widgets.get("nombre_job")
 ruta = dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get()
 CARPETA = ruta.rsplit("/", 1)[0]
 NOTEBOOKS = {   # ✏️ al integrar la versión final a main, quitar el sufijo _exploratorio
-    "bronze": f"{CARPETA}/01_bronze_ingesta_exploratorio",
-    "silver": f"{CARPETA}/02_silver_limpieza_exploratorio",
-    "gold":   f"{CARPETA}/03_gold_productos_datos_exploratorio",
+    "bronze": f"{CARPETA}/01_bronze_ingesta_grupo_06",
+    "silver": f"{CARPETA}/02_silver_limpieza_grupo_06",
+    "gold":   f"{CARPETA}/03_gold_productos_datos_grupo_06",
 }
 for k, v in NOTEBOOKS.items():
     print(f"{k:7s} → {v}")
