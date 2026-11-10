@@ -13,6 +13,7 @@
 
 # COMMAND ----------
 
+# MAGIC %md
 # MAGIC La estrategia de la sección 5 del Documento Formal se **implementa** aquí con controles nativos de UC:
 # MAGIC tags de clasificación, permisos (GRANT) por rol, enmascaramiento de datos personales, la matriz RACI
 # MAGIC como tabla consultable y la evidencia de lineage.
@@ -277,7 +278,7 @@ ejecutar("ALTER TABLE workspace.yelp_silver.slv_tip    ALTER COLUMN text SET MAS
 # MAGIC - [ ] Máscara funcionando: captura del mismo SELECT con Leila (Data Owner, enmascarado) y con David (Data Steward, en claro).
 # MAGIC - [ ] Matriz RACI cargada en `yelp_gov.matriz_raci`.
 # MAGIC - [ ] Lineage de `review` documentado con capturas.
-
+# MAGIC
 
 # COMMAND ----------
 
@@ -292,7 +293,7 @@ ejecutar("ALTER TABLE workspace.yelp_silver.slv_tip    ALTER COLUMN text SET MAS
 # MAGIC - [ ] GRANTs ejecutados + captura de un usuario "Marketing" intentando (y fallando) leer bronze.
 # MAGIC - [ ] Máscara PII funcionando: captura del mismo SELECT con dos usuarios distintos.
 # MAGIC - [ ] Lineage de `review` documentado con capturas.
-
+# MAGIC
 
 # COMMAND ----------
 
