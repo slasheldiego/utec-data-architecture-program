@@ -279,32 +279,3 @@ ejecutar("ALTER TABLE workspace.yelp_silver.slv_tip    ALTER COLUMN text SET MAS
 # MAGIC - [ ] Matriz RACI cargada en `yelp_gov.matriz_raci`.
 # MAGIC - [ ] Lineage de `review` documentado con capturas.
 # MAGIC
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Control 4 — Evidencia de lineage y auditoría
-# MAGIC > ✏️ TODO — Insertar en `img/` capturas del lineage end-to-end de Catalog Explorer
-# MAGIC > (raw → bronze → silver → gold → dashboard) para la entidad `review`, respondiendo
-# MAGIC > directamente al dolor de Trust & Safety: "reglas de fraude sin linaje claro".
-# MAGIC
-# MAGIC ### Definition of Done (E6)
-# MAGIC - [ ] Tags de clasificación aplicados a schemas y columnas PII.
-# MAGIC - [ ] GRANTs ejecutados + captura de un usuario "Marketing" intentando (y fallando) leer bronze.
-# MAGIC - [ ] Máscara PII funcionando: captura del mismo SELECT con dos usuarios distintos.
-# MAGIC - [ ] Lineage de `review` documentado con capturas.
-# MAGIC
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Control 4 — Evidencia de lineage y auditoría
-# MAGIC > ✏️ TODO — Insertar en `img/` capturas del lineage end-to-end de Catalog Explorer
-# MAGIC > (raw → bronze → silver → gold → dashboard) para la entidad `review`, respondiendo
-# MAGIC > directamente al dolor de Trust & Safety: "reglas de fraude sin linaje claro".
-# MAGIC
-# MAGIC ### Definition of Done (E6)
-# MAGIC - [ ] Tags de clasificación aplicados a schemas y columnas PII.
-# MAGIC - [ ] GRANTs ejecutados + captura de un usuario "Marketing" intentando (y fallando) leer bronze.
-# MAGIC - [ ] Máscara PII funcionando: captura del mismo SELECT con dos usuarios distintos.
-# MAGIC - [ ] Lineage de `review` documentado con capturas.
