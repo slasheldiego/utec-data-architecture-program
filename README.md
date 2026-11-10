@@ -1,8 +1,33 @@
-# Capstone Project — Plataforma de Datos YelpConnect
-### Programa de Arquitectura de Datos · UTEC
+# Plataforma de Datos YelpConnect — Grupo 06 (Ecodata)
+### Programa de Arquitectura de Datos · UTEC · Caso Trust & Safety: detección de reseñas falsas
 
-Este repositorio es el **esqueleto base** que cada grupo usará para desplegar los
-entregables **ejecutables** del Capstone en **Databricks Free Edition**.
+Implementación en Databricks Free Edition del Documento Formal de Arquitectura de Datos del Grupo 06.
+Muestra: Philadelphia (14.577 negocios, 400.000 reseñas, 150.000 usuarios).
+
+**Integrantes:** 
+- Leila (Arquitecta de datos)
+- David (Steward de gobierno y calidad)
+- Fiorela (Ingeniera de datos)
+- Juan Carlos (Analista de BI y valor)
+- Edgar (Modelador de datos)
+
+## Notebooks del Grupo 06
+
+Los notebooks del grupo son los que terminan en **`_grupo_06`** (en E3: `_grupo6`). Los que no tienen sufijo
+son el esqueleto original del curso y se conservan solo como referencia.
+
+| Carpeta | Notebook del grupo | Qué deja en el catálogo |
+|---|---|---|
+| 00_setup | `00_configurar_lakehouse_grupo_06`, `01_verificar_datos_raw_grupo_06` | Schemas, volumes y tablas de control |
+| E3 | `01_modelo_fisico_ddl_grupo6` | DDL de silver (5 tablas) y de gold (7 tablas + 1 vista), con COMMENT y PK/FK |
+| E4 | `01_glosario_negocio_grupo_06`, `02_diccionario_datos_grupo_06` | `glosario_negocio` (29 términos), `diccionario_datos` (79 elementos) y tags de clasificación |
+| E5 | `01_reglas_calidad_grupo_06` | `dq_reglas` (19 reglas), `dq_resultados`, `dq_excepciones`, `vw_dq_reglas_publica` |
+| E6 | `01_controles_unity_catalog_grupo_06` | Permisos por rol, máscaras de datos personales, `matriz_raci` |
+| E7 | `01_bronze_ingesta` → `02_silver_limpieza` → `03_gold_productos_datos` → `04_job_orquestacion` (todos `_grupo_06`) | Bronze, silver con cuarentena, gold, job diario y `pipeline_bitacora` |
+| E8 | `01_consultas_base_dashboard_grupo_06` | Consultas del tablero (2 páginas) y del Genie Space |
+| EX | `01_analisis_ia_resenas_grupo_06` | `yelp_gov.ex_resenas_enriquecidas` (bonus) |
+
+Las capturas de evidencia están en `img/`.
 
 > **Importante — dónde vive cada entregable.**
 > El Capstone tiene **dos soportes complementarios**:
@@ -113,16 +138,32 @@ Un entregable de plataforma está terminado cuando:
 
 ## 6. Orden de ejecución recomendado
 
+Primera vez (una sola vez, en este orden):
 ```
-00_setup/00_configurar_lakehouse      →  00_setup/01_verificar_datos_raw
-      ↓
-E7/01_bronze_ingesta                  →  E3/01_modelo_fisico_ddl
-      ↓
-E7/02_silver_limpieza                 →  E4/01_glosario · E4/02_diccionario
-      ↓
-E5/01_reglas_calidad                  →  E6/01_controles_unity_catalog
-      ↓
-E7/03_gold_productos_datos            →  E8/01_consultas_base_dashboard
-      ↓
-E7/04_job_orquestacion                →  EX/01_analisis_ia_resenas (bonus)
+00_setup/00_configurar_lakehouse  →  00_setup/01_verificar_datos_raw
+E7/01_bronze_ingesta              (carga los 5 archivos; reseñas con Auto Loader)
+E3/01_modelo_fisico_ddl           (crea las tablas silver y gold vacías)
+E7/02_silver_limpieza             (llena silver y cuarentena; su gate ejecuta E5)
+E7/03_gold_productos_datos        (llena gold y calcula las señales de fraude)
+E4/01_glosario  →  E4/02_diccionario  (requiere subir los Excel _Grupo06 a /Volumes/workspace/yelp_gov/artefactos/)
+E6/01_controles_unity_catalog     (requiere el grupo data_stewards y los correos en los widgets)
+E4/02_diccionario                 (otra vez: valida las reglas citadas y etiqueta gold)
+E7/04_job_orquestacion            (con el widget crear_job = si)
 ```
+Desde ahí, el job corre solo cada día a las 22:00 (hora de Lima): bronze → silver (+ E5) → gold.
+E8 se arma en la interfaz (Dashboards y Genie) con las consultas del notebook. EX es opcional.
+
+## 7. Decisiones de implementación que difieren del esqueleto
+
+| Decisión | Motivo |
+|---|---|
+| La cuarentena vive en `yelp_gov.cuarentena_<entidad>`, no en silver | Silver solo contiene datos válidos y el Diccionario cubre el 100 % de sus columnas |
+| Conversiones con `try_cast` | En modo ANSI un solo valor mal formado detendría el pipeline; con `try_cast` el registro va a cuarentena |
+| Silver y gold se llenan con `insertInto` sobre el DDL de E3 | Respeta tipos, COMMENT, constraints y máscaras; las tablas no se recrean en cada corrida |
+| El DDL de gold está en E3, no en E7/03 | Mismo patrón que silver: E3 define el molde y E7 lo llena |
+| Las señales de fraude se leen de `dq_reglas` | El umbral Restringido de DQ-016 no aparece en el código y una recalibración se aplica sola |
+| Permisos de gold tabla por tabla | `gld_salud_resenas` y `gld_dim_usuario_riesgo` son Restringidas (solo Trust & Safety) |
+| El bonus de IA guarda su resultado en `yelp_gov` | Es un experimento no aprobado: no está en el Diccionario ni debe llegar a los consumidores |
+| El tablero se publica sin credenciales embebidas | Cada lector consulta con sus propios permisos (CE-07) |
+
+Detalle completo en la sección 9 del Documento Formal.

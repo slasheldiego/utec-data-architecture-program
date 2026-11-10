@@ -48,7 +48,7 @@ OBJETOS_GOLD = ["gld_dim_tiempo", "gld_dim_negocio", "gld_dim_usuario_riesgo", "
                 "gld_kpi_resenas_sospechosas_negocio", "gld_checkins_diarios", "gld_kpi_calidad_datos",
                 "vw_rating_verificado_negocio"]
 faltan = [t for t in OBJETOS_GOLD if not spark.catalog.tableExists(f"{GLD}.{t}")]
-assert not faltan, f"❌ Faltan objetos gold: {faltan}. Ejecutar antes E3_modelo_fisico/01_modelo_fisico_ddl_exploratorio."
+assert not faltan, f"❌ Faltan objetos gold: {faltan}. Ejecutar antes E3_modelo_fisico/01_modelo_fisico_ddl_grupo_06."
 
 # Quien ejecuta debe ver el texto en claro (custodian/steward): si no, DQ-010 y DQ-013 marcarían mal
 enmascarado = spark.sql(f"SELECT count(*) c FROM {SLV}.slv_review WHERE text = '[texto oculto: dato Confidencial]'").first().c

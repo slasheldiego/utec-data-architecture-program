@@ -31,23 +31,25 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Q1 · REQ-01 — Negocios con más reseñas sospechosas en el último mes y variación (Rafael Nakamura, T&S)
+# DBTITLE 1,Q1 · REQ-01 — Negocios con más reseñas sospechosas en los últimos 12 meses (Rafael Nakamura, T&S)
 # MAGIC %sql
-# MAGIC -- KPIs: Porcentaje de reseñas sospechosas y Variación mensual (en puntos porcentuales).
-# MAGIC -- Se exige un mínimo de 5 reseñas en el mes para que un negocio con 1 reseña sospechosa no encabece el ranking.
-# MAGIC SELECT n.name                                                      AS negocio,
-# MAGIC        k.mes,
-# MAGIC        k.n_resenas,
-# MAGIC        k.n_sospechosas,
-# MAGIC        k.pct_sospechosas,
-# MAGIC        k.pct_sospechosas_mes_anterior,
-# MAGIC        k.pct_sospechosas - k.pct_sospechosas_mes_anterior          AS variacion_pp
-# MAGIC FROM workspace.yelp_gold.gld_kpi_resenas_sospechosas_negocio k
-# MAGIC JOIN workspace.yelp_gold.gld_dim_negocio n USING (business_id)
-# MAGIC WHERE k.mes = (SELECT max(mes) FROM workspace.yelp_gold.gld_kpi_resenas_sospechosas_negocio)
-# MAGIC   AND k.n_resenas >= 5
-# MAGIC ORDER BY k.pct_sospechosas DESC, k.n_sospechosas DESC
-# MAGIC LIMIT 20;
+# MAGIC -- Ventana de 12 meses: un solo mes tiene muy pocas reseñas por negocio y el porcentaje no es estable
+# MAGIC -- (el último mes de la muestra, enero 2022, está incompleto). La evolución mes a mes está en Q2.
+# MAGIC -- Mínimo de 20 reseñas para que un negocio con pocas reseñas no encabece el ranking.
+# MAGIC
+# MAGIC WITH ult AS (SELECT max(mes) AS fin FROM workspace.yelp_gold.gld_kpi_resenas_sospechosas_negocio)
+# MAGIC SELECT n.name AS negocio,
+# MAGIC         sum(k.n_resenas) AS resenas,
+# MAGIC         sum(k.n_sospechosas) AS sospechosas,
+# MAGIC         round(try_divide(100.0 * sum(k.n_sospechosas), sum(k.n_resenas)), 2) AS pct_sospechosas
+# MAGIC  FROM workspace.yelp_gold.gld_kpi_resenas_sospechosas_negocio k
+# MAGIC  JOIN workspace.yelp_gold.gld_dim_negocio n USING (business_id)
+# MAGIC  CROSS JOIN ult
+# MAGIC  WHERE k.mes > add_months(ult.fin, -12)
+# MAGIC  GROUP BY n.name, k.business_id
+# MAGIC  HAVING sum(k.n_resenas) >= 20 AND sum(k.n_sospechosas) > 0
+# MAGIC  ORDER BY pct_sospechosas DESC, sospechosas DESC
+# MAGIC  LIMIT 20;
 
 # COMMAND ----------
 

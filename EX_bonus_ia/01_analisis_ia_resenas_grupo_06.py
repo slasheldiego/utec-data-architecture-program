@@ -93,10 +93,12 @@ display(spark.table(TABLA).limit(10))
 
 # MAGIC %md
 # MAGIC ### Conclusiones para Trust & Safety (completar con los resultados de la corrida)
-# MAGIC - ✏️ % de reseñas contradictorias entre las **sospechosas**: … · entre las **verificadas**: …
-# MAGIC - ✏️ Si el porcentaje es claramente mayor entre las sospechosas, la contradicción es candidata a **sexta señal**
-# MAGIC   de la sección 6.4 (con peso Bajo hasta calibrarla con casos revisados). Si no, se descarta y se documenta.
-# MAGIC - ✏️ Ejemplos revisados a mano (3 a 5 `review_id`) y si el modelo acertó.
+# MAGIC - **Contradicción calificación ↔ texto: 0 de 250 sospechosas (0,0 %) y 0 de 250 verificadas (0,0 %).** No hay diferencia entre los grupos, así que la contradicción **se descarta como sexta señal** de la sección 6.4 para esta muestra.
+# MAGIC - **El modelo es coherente con las estrellas:** las reseñas con sentimiento positivo promedian entre 4,6 y 4,8 estrellas, las negativas entre 1,2 y 1,7, y las mixtas entre 2,7 y 3,6. Eso valida el uso de `ai_analyze_sentiment` sobre este texto, pero no aporta información nueva sobre el fraude.
+# MAGIC - **Interpretación:** las reseñas sospechosas de la muestra lo son por **comportamiento**: ráfagas (DQ-016) y textos copiados (DQ-010). Una reseña falsa bien construida es coherente, con texto positivo y calificación alta, por eso esta prueba no la distingue.
+# MAGIC - **Revisión manual:** se leyeron 3 reseñas, una positiva (`-PxDY9IihbfmEPNnPwZpDQ`), una negativa (`-5TxEvH6hBQQCbypH6aTbw`) y una mixta (`04s6c6iWZ9VxJrQkY_blLw`). En las 3, el sentimiento y el tema asignados correspondían al texto, incluido el caso «otro»: una reseña sobre la historia de un edificio.
+# MAGIC - **Hallazgo técnico:** Databricks Free Edition sí permite usar AI Functions; la muestra de 500 reseñas tardó unos 2,5 minutos.
+# MAGIC - **Próximo paso posible (no implementado):** usar el modelo para detectar textos genéricos o con lenguaje publicitario, más típicos de reseñas pagadas.
 # MAGIC
 # MAGIC ### Reflexión de gobierno de IA (borrador para revisar en grupo)
 # MAGIC Persistir la salida de un modelo de lenguaje como dato productivo introduce riesgos que las reglas de calidad de la
