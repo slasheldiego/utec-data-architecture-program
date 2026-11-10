@@ -126,7 +126,7 @@ else:
 # MAGIC 1. **Real (recomendada):** las excepciones de DQ-011 y DQ-018 (Acta 05) caducan el **12/11/2026**. Si no se
 # MAGIC    renuevan, la corrida del 13/11 se detiene en la tarea *silver* por DQ-011 (criticidad alta, 93,3 %), gold no
 # MAGIC    se publica y llega el correo de falla. Es exactamente el comportamiento que describe la sección 8.1.
-# MAGIC 2. **Forzada:** en E5 `_exploratorio`, cambiar temporalmente el umbral de DQ-001 de `100` a `101`, lanzar *Run now*,
+# MAGIC 2. **Forzada:** en E5 `_grupo_06`, cambiar temporalmente el umbral de DQ-001 de `100` a `101`, lanzar *Run now*,
 # MAGIC    capturar la falla y **devolver el umbral a 100**. Anotar ambas acciones en la bitácora de 8.2.
 # MAGIC
 # MAGIC > Ojo: con 1 reintento, una corrida detenida por el gate se intenta dos veces. Es aceptable para la muestra; en
@@ -144,7 +144,7 @@ else:
 # MAGIC   duracion_seg     DOUBLE
 # MAGIC ) COMMENT 'Observabilidad del pipeline: volumetría y duración por corrida';
 # MAGIC
-# MAGIC -- Los notebooks 01, 02 y 03 (_exploratorio) ya registran aquí sus métricas en cada corrida.
+# MAGIC -- Los notebooks 01, 02 y 03 (_grupo_06) ya registran aquí sus métricas en cada corrida.
 # MAGIC -- Resumen por día y capa (en gold, la duración máxima es la del notebook completo).
 # MAGIC SELECT date(ejecucion_ts) AS dia, capa,
 # MAGIC        count(DISTINCT ejecucion_ts)        AS corridas,
