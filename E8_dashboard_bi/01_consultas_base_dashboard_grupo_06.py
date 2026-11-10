@@ -91,6 +91,7 @@
 # MAGIC        ex.acta
 # MAGIC FROM workspace.yelp_gold.gld_kpi_calidad_datos k
 # MAGIC LEFT JOIN workspace.yelp_gov.dq_excepciones ex ON ex.regla_id = k.regla_id
+# MAGIC   AND current_date() BETWEEN ex.fecha_aprobacion AND ex.fecha_caducidad
 # MAGIC WHERE k.ejecucion_ts = (SELECT max(ejecucion_ts) FROM workspace.yelp_gold.gld_kpi_calidad_datos)
 # MAGIC   AND NOT k.paso
 # MAGIC ORDER BY CASE k.criticidad WHEN 'alta' THEN 1 ELSE 2 END, k.pct_cumplimiento;
