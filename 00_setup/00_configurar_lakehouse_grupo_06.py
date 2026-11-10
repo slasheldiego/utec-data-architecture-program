@@ -135,4 +135,4 @@ print("Tablas de control creadas ✔")
 # MAGIC %md
 # MAGIC ## Siguiente paso
 # MAGIC 1. Correr en su laptop `datos/preparar_muestra_yelp.py` y subir los `.json.gz` al Volume.
-# MAGIC 2. Ejecutar `00_setup/01_verificar_datos_raw`.
+# MAGIC 2. Ejecutar `00_setup/01_verificar_datos_raw_grupo_06`.
