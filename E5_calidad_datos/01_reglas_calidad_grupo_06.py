@@ -248,7 +248,7 @@ spark.sql("""
                 'Los tips huérfanos permanecen en cuarentena y no llegan a gold; la regla sigue evaluándose y registrándose como falla.' AS tratamiento,
                 'Andrew Collins (Data Owner, Producto) a propuesta de Rafael Nakamura (Steward)' AS aprobado_por,
                 DATE'2026-10-13' AS fecha_aprobacion,
-                DATE'2026-11-12' AS fecha_caducidad,
+                DATE'2026-12-12' AS fecha_caducidad,
                 'Acta 05' AS acta) s
   ON t.regla_id = s.regla_id AND t.acta = s.acta
   WHEN MATCHED THEN UPDATE SET *   -- si el acta ya está registrada, se alinea con las fechas del código
@@ -261,6 +261,21 @@ spark.sql("""
   USING (SELECT 'DQ-011' AS regla_id,
                 'Renovación única de la excepción del Acta 05: la muestra sigue limitada a 150.000 autores y el 6,7 % de las reseñas queda sin usuario.' AS motivo,
                 'Las reseñas sin autor permanecen en cuarentena y no llegan a gold; la regla sigue evaluándose y registrándose como falla.' AS tratamiento,
+                'Andrew Collins (Data Owner, Producto) a propuesta de Rafael Nakamura (Steward)' AS aprobado_por,
+                DATE'2026-11-13' AS fecha_aprobacion,
+                DATE'2026-12-12' AS fecha_caducidad,
+                'Acta 06' AS acta) s
+  ON t.regla_id = s.regla_id AND t.acta = s.acta
+  WHEN MATCHED THEN UPDATE SET *
+  WHEN NOT MATCHED THEN INSERT *
+""")
+
+# Acta 06: renovación única de la excepción de DQ-018 (sección 5.5).
+spark.sql("""
+  MERGE INTO workspace.yelp_gov.dq_excepciones t
+  USING (SELECT 'DQ-018' AS regla_id,
+                'Renovación única de la excepción del Acta 05: el script de muestreo no incluye a los autores de tips y el 26,0 % de los tips queda sin usuario.' AS motivo,
+                'Los tips huérfanos permanecen en cuarentena y no llegan a gold; la regla sigue evaluándose y registrándose como falla.' AS tratamiento,
                 'Andrew Collins (Data Owner, Producto) a propuesta de Rafael Nakamura (Steward)' AS aprobado_por,
                 DATE'2026-11-13' AS fecha_aprobacion,
                 DATE'2026-12-12' AS fecha_caducidad,
@@ -302,7 +317,7 @@ dbutils.notebook.exit("ok: 19 reglas evaluadas")
 # MAGIC | Regla | Criticidad | Umbral | % obtenido | Decisión | Firma |
 # MAGIC |---|---|---|---|---|---|
 # MAGIC | DQ-011 · Reseña con usuario existente | Alta | 99,5 % | 93,3 % | **Aceptación del riesgo con caducidad.** Falla por el muestreo (solo 150.000 autores), no por el origen. Las reseñas sin autor quedan en cuarentena y no llegan a gold. Excepción original hasta el 12/11/2026 (Acta 05), renovada una única vez hasta el 12/12/2026 (Acta 06). | Andrew Collins (Data Owner), a propuesta de Rafael Nakamura (Steward) |
-# MAGIC | DQ-018 · Tip con negocio y usuario existentes | Media | 99,5 % | 74,0 % | **Aceptación del riesgo con caducidad.** El script de muestreo no incluye a los autores de tips. Los tips huérfanos quedan en cuarentena y no llegan a gold. Al ser de criticidad media, no detiene el pipeline. Excepción hasta el 12/11/2026 (Acta 05). | Andrew Collins (Data Owner), a propuesta de Rafael Nakamura (Steward) |
+# MAGIC | DQ-018 · Tip con negocio y usuario existentes | Media | 99,5 % | 74,0 % | **Aceptación del riesgo con caducidad.** El script de muestreo no incluye a los autores de tips. Los tips huérfanos quedan en cuarentena y no llegan a gold. Al ser de criticidad media, no detiene el pipeline. Excepción hasta el 12/11/2026 (Acta 05), renovada una única vez hasta el 12/12/2026 (Acta 06). | Andrew Collins (Data Owner), a propuesta de Rafael Nakamura (Steward) |
 # MAGIC
 # MAGIC Las otras 17 reglas cumplen su umbral en la última corrida (scorecard: 4 de 4 en validez, consistencia y unicidad; 2 de 2 en completitud; 1 de 1 en actualidad; 2 de 4 en integridad).
 # MAGIC
