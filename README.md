@@ -20,7 +20,7 @@ son el esqueleto original del curso y se conservan solo como referencia.
 |---|---|---|
 | 00_setup | `00_configurar_lakehouse_grupo_06`, `01_verificar_datos_raw_grupo_06` | Schemas, volumes y tablas de control |
 | E3 | `01_modelo_fisico_ddl_grupo6` | DDL de silver (5 tablas) y de gold (7 tablas + 1 vista), con COMMENT y PK/FK |
-| E4 | `01_glosario_negocio_grupo_06`, `02_diccionario_datos_grupo_06` | `glosario_negocio` (29 términos), `diccionario_datos` (79 elementos) y tags de clasificación |
+| E4 | `01_glosario_negocio_grupo_06`, `02_diccionario_datos_grupo_06` , `03_golden_record_negocio_grupo_06`| `glosario_negocio` (29 términos), `diccionario_datos` (79 elementos) y tags de clasificación, mdm_negocio_correspondencia y mdm_negocio_golden (golden record de negocios). |
 | E5 | `01_reglas_calidad_grupo_06` | `dq_reglas` (19 reglas), `dq_resultados`, `dq_excepciones`, `vw_dq_reglas_publica` |
 | E6 | `01_controles_unity_catalog_grupo_06` | Permisos por rol, máscaras de datos personales, `matriz_raci` |
 | E7 | `01_bronze_ingesta` → `02_silver_limpieza` → `03_gold_productos_datos` → `04_job_orquestacion` (todos `_grupo_06`) | Bronze, silver con cuarentena, gold, job diario y `pipeline_bitacora` |
@@ -146,6 +146,7 @@ E3/01_modelo_fisico_ddl           (crea las tablas silver y gold vacías)
 E7/02_silver_limpieza             (llena silver y cuarentena; su gate ejecuta E5)
 E7/03_gold_productos_datos        (llena gold y calcula las señales de fraude)
 E4/01_glosario  →  E4/02_diccionario  (requiere subir los Excel _Grupo06 a /Volumes/workspace/yelp_gov/artefactos/)
+E4/03_golden_record_negocio        (requiere bronze; lo ejecuta un custodian)
 E6/01_controles_unity_catalog     (requiere el grupo data_stewards y los correos en los widgets)
 E4/02_diccionario                 (otra vez: valida las reglas citadas y etiqueta gold)
 E7/04_job_orquestacion            (con el widget crear_job = si)
@@ -161,6 +162,7 @@ E8 se arma en la interfaz (Dashboards y Genie) con las consultas del notebook. E
 | Conversiones con `try_cast` | En modo ANSI un solo valor mal formado detendría el pipeline; con `try_cast` el registro va a cuarentena |
 | Silver y gold se llenan con `insertInto` sobre el DDL de E3 | Respeta tipos, COMMENT, constraints y máscaras; las tablas no se recrean en cada corrida |
 | El DDL de gold está en E3, no en E7/03 | Mismo patrón que silver: E3 define el molde y E7 lo llena |
+| El golden record vive en yelp_gov y no en gold | Los 20 grupos requieren aprobación del steward antes de cambiar gld_dim_negocio
 | Las señales de fraude se leen de `dq_reglas` | El umbral Restringido de DQ-016 no aparece en el código y una recalibración se aplica sola |
 | Permisos de gold tabla por tabla | `gld_salud_resenas` y `gld_dim_usuario_riesgo` son Restringidas (solo Trust & Safety) |
 | El bonus de IA guarda su resultado en `yelp_gov` | Es un experimento no aprobado: no está en el Diccionario ni debe llegar a los consumidores |
